@@ -6,41 +6,29 @@ using System.Threading.Tasks;
 
 namespace WebApplication11
 {
-
-public class CustomViewLocatorExpander : IViewLocationExpander
-{
-    public IEnumerable<string> ExpandViewLocations(ViewLocationExpanderContext context, IEnumerable<string> viewLocations)
+    public class CustomViewLocatorExpander : IViewLocationExpander
     {
-        throw new NotImplementedException();
+        public virtual IEnumerable<string> ExpandViewLocations(ViewLocationExpanderContext context, IEnumerable<string> viewLocations)
+        {
+            var viewLocationsFinal = new List<string>();
+            if (!string.IsNullOrEmpty(context.Values["viewCustom"]))
+            {
+                foreach (var viewLocation in viewLocations)
+                {
+                    viewLocationsFinal.Add(viewLocation.Replace(".cshtml", ".mobile.cshtml"));
+                }
+            }
+            viewLocationsFinal.AddRange(viewLocations);
+
+            return viewLocationsFinal;
+        }
+
+
+        public void PopulateValues(ViewLocationExpanderContext context)
+        {
+            var userAgent = context.ActionContext.HttpContext.Request.Headers["User-Agent"].ToString().ToLower();
+            var viewCustom = userAgent.Contains("android") || userAgent.Contains("ios") ? "mobile" : "";
+            context.Values["viewCustom"] = viewCustom;
+        }
     }
-
-    public void PopulateValues(ViewLocationExpanderContext context)
-    {
-        throw new NotImplementedException();
-    }
-}
-
-
-
-
-    //public class CustomViewLocatorExpander : IViewLocationExpander
-    //{
-    //    public IEnumerable<string> ExpandViewLocations(ViewLocationExpanderContext context, IEnumerable<string> viewLocations)
-    //    {
-    //        //alterar o caminho das views
-    //        foreach (var viewLocation in viewLocations)
-    //        {
-    //            yield return viewLocation.Replace("/Views/", $"/Views/{context.Values["tema"]}/");
-    //        }
-    //    }
-
-public void PopulateValues(ViewLocationExpanderContext context)
-{
-    //acesssar o context e pegar o tema do usuário
-    var userName = context.ActionContext.HttpContext.User.Identity.Name;
-    //ex: loadTema by user
-    var tema = "tema-1";
-    context.Values["tema"] = tema;
-}
-    //}
 }
