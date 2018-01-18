@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Mvc.Razor;
 
 namespace WebApplication11
 {
@@ -22,6 +23,11 @@ namespace WebApplication11
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.Configure<RazorViewEngineOptions>(options =>
+            {
+                options.ViewLocationExpanders.Add(new CustomViewLocatorExpander());
+            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -47,4 +53,5 @@ namespace WebApplication11
             });
         }
     }
+  
 }
